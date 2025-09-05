@@ -32,6 +32,10 @@ class HandCrossingCounter:
         self.last_crossing_time = 0
         self.crossing_cooldown = 0.05  # Very tight cooldown - prevent multiple counts
         
+        # Rate tracking for "67s per second"
+        self.start_time = time.time()
+        self.count_timestamps = []  # Store timestamps of each count
+        
         # Enhanced tracking for better sensitivity
         self.min_crossing_distance = 0.01  # Very small minimum Y distance
         self.hand_history = {'left': [], 'right': []}  # Track recent positions
@@ -69,6 +73,27 @@ class HandCrossingCounter:
             self.hand_history['right'].append(right_y)
             if len(self.hand_history['right']) > self.history_length:
                 self.hand_history['right'].pop(0)
+    
+    def get_counts_per_minute(self, current_time):
+        """Calculate the average counts per minute over the last 60 seconds."""
+        # Remove timestamps older than 60 seconds
+        cutoff_time = current_time - 60.0
+        self.count_timestamps = [t for t in self.count_timestamps if t > cutoff_time]
+        
+        # Calculate counts per minute
+        if len(self.count_timestamps) == 0:
+            return 0.0
+        
+        # If we have less than 60 seconds of data, extrapolate
+        elapsed_time = current_time - self.start_time
+        if elapsed_time < 60.0:
+            if elapsed_time > 0:
+                return (len(self.count_timestamps) / elapsed_time) * 60.0
+            else:
+                return 0.0
+        else:
+            # We have at least 60 seconds of data
+            return len(self.count_timestamps)
     
     def detect_crossing(self, current_time):
         """Detect whenever any hand falls below the other with very aggressive sensitivity."""
@@ -110,12 +135,13 @@ class HandCrossingCounter:
                 if hand_fell_below:
                     self.crossing_count += 1
                     self.last_crossing_time = current_time
+                    self.count_timestamps.append(current_time)  # Record timestamp for rate calculation
                     print(f"Hand position detected! {crossing_type} - Count: {self.crossing_count}")
                     return True
         
         return False
     
-    def draw_ui(self, image):
+    def draw_ui(self, image, current_time):
         """Draw the user interface on the image."""
         height, width = image.shape[:2]
         
@@ -124,22 +150,28 @@ class HandCrossingCounter:
         cv2.putText(image, counter_text, (20, 50), self.font, self.font_scale, 
                    (0, 255, 0), self.thickness)
         
+        # Draw "67s per second" (counts per minute)
+        counts_per_minute = self.get_counts_per_minute(current_time)
+        rate_text = f"67s per second: {counts_per_minute:.1f}"
+        cv2.putText(image, rate_text, (20, 90), self.font, self.font_scale, 
+                   (255, 255, 0), self.thickness)
+        
         # Draw hand positions if detected
         if self.left_hand_y is not None:
             left_text = f"Left Y: {self.left_hand_y:.3f}"
-            cv2.putText(image, left_text, (20, 100), self.font, 0.6, 
+            cv2.putText(image, left_text, (20, 130), self.font, 0.6, 
                        (255, 0, 0), 2)
         
         if self.right_hand_y is not None:
             right_text = f"Right Y: {self.right_hand_y:.3f}"
-            cv2.putText(image, right_text, (20, 130), self.font, 0.6, 
+            cv2.putText(image, right_text, (20, 160), self.font, 0.6, 
                        (0, 0, 255), 2)
         
         # Show distance between hands if both detected
         if self.left_hand_y is not None and self.right_hand_y is not None:
             distance = abs(self.left_hand_y - self.right_hand_y)
             distance_text = f"Distance: {distance:.3f}"
-            cv2.putText(image, distance_text, (20, 160), self.font, 0.5, 
+            cv2.putText(image, distance_text, (20, 190), self.font, 0.5, 
                        (0, 255, 255), 2)
         
         # Draw instructions
@@ -165,10 +197,16 @@ class HandCrossingCounter:
         filename = f"crossing_results_{timestamp}.txt"
         
         try:
+            current_time = time.time()
+            counts_per_minute = self.get_counts_per_minute(current_time)
+            elapsed_time = current_time - self.start_time
+            
             with open(filename, 'w') as f:
-                f.write(f"Hand Crossing Counter Results\n")
+                f.write(f"Hand Position Counter Results\n")
                 f.write(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
                 f.write(f"Total Crossings: {self.crossing_count}\n")
+                f.write(f"67s per second: {counts_per_minute:.1f}\n")
+                f.write(f"Session Duration: {elapsed_time:.1f} seconds\n")
             
             print(f"Results saved to {filename}")
         except Exception as e:
@@ -178,7 +216,9 @@ class HandCrossingCounter:
         """Reset the crossing counter."""
         self.crossing_count = 0
         self.last_crossing_time = 0
-        print("Counter reset to 0")
+        self.start_time = time.time()
+        self.count_timestamps = []
+        print("Counter and rate tracking reset to 0")
     
     def run(self):
         """Main execution loop."""
@@ -275,7 +315,7 @@ class HandCrossingCounter:
                 crossing_detected = self.detect_crossing(current_time)
                 
                 # Draw UI
-                frame = self.draw_ui(frame)
+                frame = self.draw_ui(frame, current_time)
                 
                 # Show frame
                 cv2.imshow('Hand Crossing Counter', frame)
