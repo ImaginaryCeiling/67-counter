@@ -18,8 +18,8 @@ class HandCrossingCounter:
         self.hands = self.mp_hands.Hands(
             static_image_mode=False,
             max_num_hands=2,
-            min_detection_confidence=0.5,  # More aggressive detection
-            min_tracking_confidence=0.3    # More aggressive tracking
+            min_detection_confidence=0.3,  # Very aggressive detection
+            min_tracking_confidence=0.1    # Very aggressive tracking
         )
         self.mp_draw = mp.solutions.drawing_utils
         
@@ -30,19 +30,20 @@ class HandCrossingCounter:
         self.previous_left_y = None
         self.previous_right_y = None
         self.last_crossing_time = 0
-        self.crossing_cooldown = 0.1  # Tighter cooldown - prevent multiple counts
+        self.crossing_cooldown = 0.05  # Very tight cooldown - prevent multiple counts
         
         # Enhanced tracking for better sensitivity
-        self.min_crossing_distance = 0.02  # Minimum Y distance for valid crossing
+        self.min_crossing_distance = 0.01  # Very small minimum Y distance
         self.hand_history = {'left': [], 'right': []}  # Track recent positions
-        self.history_length = 3  # Number of frames to keep in history
+        self.history_length = 2  # Reduced frames for faster response
         
         # Display settings
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.font_scale = 1
         self.thickness = 2
         
-        print("Hand Crossing Counter initialized!")
+        print("Aggressive Hand Position Counter initialized!")
+        print("Counts whenever any hand falls below the other")
         print("Controls:")
         print("- 'r' to reset counter")
         print("- 's' to save results")
@@ -70,37 +71,47 @@ class HandCrossingCounter:
                 self.hand_history['right'].pop(0)
     
     def detect_crossing(self, current_time):
-        """Detect if left hand crosses right hand vertically with enhanced sensitivity."""
-        if (self.left_hand_y is not None and self.right_hand_y is not None and
-            self.previous_left_y is not None and self.previous_right_y is not None):
+        """Detect whenever any hand falls below the other with very aggressive sensitivity."""
+        if (self.left_hand_y is not None and self.right_hand_y is not None):
             
             # Calculate the distance between hands
             y_distance = abs(self.left_hand_y - self.right_hand_y)
-            prev_y_distance = abs(self.previous_left_y - self.previous_right_y)
             
-            # Check if hands crossed vertically with minimum distance threshold
-            crossed_now = False
-            
-            # Left hand crossing from above to below right hand
-            if (self.left_hand_y > self.right_hand_y and 
-                self.previous_left_y < self.previous_right_y and
-                y_distance > self.min_crossing_distance):
-                crossed_now = True
-                crossing_type = "Left hand crossed below right hand"
-            
-            # Left hand crossing from below to above right hand  
-            elif (self.left_hand_y < self.right_hand_y and 
-                  self.previous_left_y > self.previous_right_y and
-                  y_distance > self.min_crossing_distance):
-                crossed_now = True
-                crossing_type = "Left hand crossed above right hand"
-            
-            # Apply cooldown to prevent multiple counts
-            if crossed_now and (current_time - self.last_crossing_time) > self.crossing_cooldown:
-                self.crossing_count += 1
-                self.last_crossing_time = current_time
-                print(f"Crossing detected! {crossing_type} - Count: {self.crossing_count}")
-                return True
+            # Check if hands have sufficient separation and cooldown has passed
+            if (y_distance > self.min_crossing_distance and 
+                (current_time - self.last_crossing_time) > self.crossing_cooldown):
+                
+                hand_fell_below = False
+                crossing_type = ""
+                
+                # Check if we have previous positions for comparison
+                if (self.previous_left_y is not None and self.previous_right_y is not None):
+                    # Left hand fell below right hand (was above or equal, now below)
+                    if (self.left_hand_y > self.right_hand_y and 
+                        self.previous_left_y <= self.previous_right_y):
+                        hand_fell_below = True
+                        crossing_type = "Left hand fell below right hand"
+                    
+                    # Right hand fell below left hand (was above or equal, now below)
+                    elif (self.right_hand_y > self.left_hand_y and 
+                          self.previous_right_y <= self.previous_left_y):
+                        hand_fell_below = True
+                        crossing_type = "Right hand fell below left hand"
+                else:
+                    # If no previous positions, just check current relative positions
+                    if self.left_hand_y > self.right_hand_y:
+                        hand_fell_below = True
+                        crossing_type = "Left hand is below right hand"
+                    elif self.right_hand_y > self.left_hand_y:
+                        hand_fell_below = True
+                        crossing_type = "Right hand is below left hand"
+                
+                # Count the event
+                if hand_fell_below:
+                    self.crossing_count += 1
+                    self.last_crossing_time = current_time
+                    print(f"Hand position detected! {crossing_type} - Count: {self.crossing_count}")
+                    return True
         
         return False
     
@@ -198,10 +209,11 @@ class HandCrossingCounter:
             print("3. Camera is properly connected")
             return
         
-        # Set camera properties for better performance
+        # Set camera properties for maximum performance
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        cap.set(cv2.CAP_PROP_FPS, 30)
+        cap.set(cv2.CAP_PROP_FPS, 60)  # Higher FPS for more responsive tracking
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # Reduce buffer to minimize lag
         
         print("Starting hand tracking... Position your hands in front of the camera")
         print("Make sure to allow camera access if prompted by macOS")
