@@ -18,8 +18,8 @@ class HandCrossingCounter:
         self.hands = self.mp_hands.Hands(
             static_image_mode=False,
             max_num_hands=2,
-            min_detection_confidence=0.7,
-            min_tracking_confidence=0.5
+            min_detection_confidence=0.5,  # More aggressive detection
+            min_tracking_confidence=0.3    # More aggressive tracking
         )
         self.mp_draw = mp.solutions.drawing_utils
         
@@ -30,7 +30,12 @@ class HandCrossingCounter:
         self.previous_left_y = None
         self.previous_right_y = None
         self.last_crossing_time = 0
-        self.crossing_cooldown = 0.5  # Prevent multiple counts for same crossing
+        self.crossing_cooldown = 0.1  # Tighter cooldown - prevent multiple counts
+        
+        # Enhanced tracking for better sensitivity
+        self.min_crossing_distance = 0.02  # Minimum Y distance for valid crossing
+        self.hand_history = {'left': [], 'right': []}  # Track recent positions
+        self.history_length = 3  # Number of frames to keep in history
         
         # Display settings
         self.font = cv2.FONT_HERSHEY_SIMPLEX
@@ -52,22 +57,49 @@ class HandCrossingCounter:
             return x, y
         return None, None
     
+    def update_hand_history(self, left_y, right_y):
+        """Update hand position history for smoother tracking."""
+        if left_y is not None:
+            self.hand_history['left'].append(left_y)
+            if len(self.hand_history['left']) > self.history_length:
+                self.hand_history['left'].pop(0)
+        
+        if right_y is not None:
+            self.hand_history['right'].append(right_y)
+            if len(self.hand_history['right']) > self.history_length:
+                self.hand_history['right'].pop(0)
+    
     def detect_crossing(self, current_time):
-        """Detect if left hand crosses right hand vertically."""
+        """Detect if left hand crosses right hand vertically with enhanced sensitivity."""
         if (self.left_hand_y is not None and self.right_hand_y is not None and
             self.previous_left_y is not None and self.previous_right_y is not None):
             
-            # Check if hands crossed vertically
-            crossed_now = (self.left_hand_y < self.right_hand_y and 
-                          self.previous_left_y > self.previous_right_y) or \
-                         (self.left_hand_y > self.right_hand_y and 
-                          self.previous_left_y < self.previous_right_y)
+            # Calculate the distance between hands
+            y_distance = abs(self.left_hand_y - self.right_hand_y)
+            prev_y_distance = abs(self.previous_left_y - self.previous_right_y)
+            
+            # Check if hands crossed vertically with minimum distance threshold
+            crossed_now = False
+            
+            # Left hand crossing from above to below right hand
+            if (self.left_hand_y > self.right_hand_y and 
+                self.previous_left_y < self.previous_right_y and
+                y_distance > self.min_crossing_distance):
+                crossed_now = True
+                crossing_type = "Left hand crossed below right hand"
+            
+            # Left hand crossing from below to above right hand  
+            elif (self.left_hand_y < self.right_hand_y and 
+                  self.previous_left_y > self.previous_right_y and
+                  y_distance > self.min_crossing_distance):
+                crossed_now = True
+                crossing_type = "Left hand crossed above right hand"
             
             # Apply cooldown to prevent multiple counts
             if crossed_now and (current_time - self.last_crossing_time) > self.crossing_cooldown:
                 self.crossing_count += 1
                 self.last_crossing_time = current_time
-                print(f"Crossing detected! Count: {self.crossing_count}")
+                print(f"Crossing detected! {crossing_type} - Count: {self.crossing_count}")
                 return True
         
         return False
@@ -83,14 +115,21 @@ class HandCrossingCounter:
         
         # Draw hand positions if detected
         if self.left_hand_y is not None:
-            left_text = f"Left Y: {self.left_hand_y:.2f}"
+            left_text = f"Left Y: {self.left_hand_y:.3f}"
             cv2.putText(image, left_text, (20, 100), self.font, 0.6, 
                        (255, 0, 0), 2)
         
         if self.right_hand_y is not None:
-            right_text = f"Right Y: {self.right_hand_y:.2f}"
+            right_text = f"Right Y: {self.right_hand_y:.3f}"
             cv2.putText(image, right_text, (20, 130), self.font, 0.6, 
                        (0, 0, 255), 2)
+        
+        # Show distance between hands if both detected
+        if self.left_hand_y is not None and self.right_hand_y is not None:
+            distance = abs(self.left_hand_y - self.right_hand_y)
+            distance_text = f"Distance: {distance:.3f}"
+            cv2.putText(image, distance_text, (20, 160), self.font, 0.5, 
+                       (0, 255, 255), 2)
         
         # Draw instructions
         instructions = [
@@ -215,6 +254,9 @@ class HandCrossingCounter:
                                 self.right_hand_y = y
                             else:  # This is actually the left hand in mirror
                                 self.left_hand_y = y
+                
+                # Update hand history for smoother tracking
+                self.update_hand_history(self.left_hand_y, self.right_hand_y)
                 
                 # Detect crossings
                 current_time = time.time()
