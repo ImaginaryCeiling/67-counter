@@ -1,0 +1,37 @@
+[
+  {
+    "username": "arnav",
+    "timestamp": "2025-09-08 10:00:09",
+    "total_crossings": 21,
+    "counts_per_minute": 107.3,
+    "session_duration_seconds": 11.7
+  },
+  {
+    "username": "arnav",
+    "timestamp": "2025-09-08 10:07:36",
+    "total_crossings": 18,
+    "counts_per_minute": 99.4,
+    "session_duration_seconds": 10.9
+  },
+  {
+    "username": "skibidi rizzler gob",
+    "timestamp": "2025-09-08 10:13:23",
+    "total_crossings": 37,
+    "counts_per_minute": 165.2,
+    "session_duration_seconds": 13.4
+  },
+  {
+    "username": "skibidi rizzler gob",
+    "timestamp": "2025-09-08 10:13:28",
+    "total_crossings": 37,
+    "counts_per_minute": 124.1,
+    "session_duration_seconds": 17.9
+  },
+  {
+    "username": "skibidi rizzler gob",
+    "timestamp": "2025-09-08 10:13:28",
+    "total_crossings": 37,
+    "counts_per_minute": 122.5,
+    "session_duration_seconds": 18.1
+  }
+]

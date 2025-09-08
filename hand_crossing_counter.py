@@ -8,11 +8,13 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import time
+import json
+import requests
 from datetime import datetime
 
 
 class HandCrossingCounter:
-    def __init__(self):
+    def __init__(self, username):
         # Initialize MediaPipe hands
         self.mp_hands = mp.solutions.hands
         self.hands = self.mp_hands.Hands(
@@ -22,6 +24,9 @@ class HandCrossingCounter:
             min_tracking_confidence=0.1    # Very aggressive tracking
         )
         self.mp_draw = mp.solutions.drawing_utils
+        
+        # User information
+        self.username = username
         
         # Tracking variables
         self.crossing_count = 0
@@ -192,23 +197,52 @@ class HandCrossingCounter:
         return image
     
     def save_results(self):
-        """Save the current results to a file."""
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"crossing_results_{timestamp}.txt"
+        """Save the current results to a file and optionally submit to API."""
+        filename = "crossing_results.json"
         
         try:
             current_time = time.time()
             counts_per_minute = self.get_counts_per_minute(current_time)
             elapsed_time = current_time - self.start_time
             
+            result_entry = {
+                "username": self.username,
+                "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                "total_crossings": self.crossing_count,
+                "counts_per_minute": round(counts_per_minute, 1),
+                "session_duration_seconds": round(elapsed_time, 1)
+            }
+            
+            # Read existing data or create empty list
+            try:
+                with open(filename, 'r') as f:
+                    results = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError):
+                results = []
+            
+            # Append new result
+            results.append(result_entry)
+            
+            # Write back to file
             with open(filename, 'w') as f:
-                f.write(f"Hand Position Counter Results\n")
-                f.write(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                f.write(f"Total Crossings: {self.crossing_count}\n")
-                f.write(f"67s per second: {counts_per_minute:.1f}\n")
-                f.write(f"Session Duration: {elapsed_time:.1f} seconds\n")
+                json.dump(results, f, indent=2)
             
             print(f"Results saved to {filename}")
+            
+            # Try to submit to API
+            try:
+                response = requests.post(
+                    'http://localhost:5002/api/submit',
+                    json=result_entry,
+                    timeout=5
+                )
+                if response.status_code == 201:
+                    print("✅ Results also submitted to API!")
+                else:
+                    print(f"⚠️  API submission failed: {response.status_code}")
+            except requests.exceptions.RequestException:
+                print("⚠️  Could not connect to API (run the Flask server for real-time rankings)")
+                
         except Exception as e:
             print(f"Error saving results: {e}")
     
@@ -340,7 +374,11 @@ class HandCrossingCounter:
 
 def main():
     """Main function to run the hand crossing counter."""
-    counter = HandCrossingCounter()
+    username = input("Enter your username: ").strip()
+    while not username:
+        username = input("Username cannot be empty. Enter your username: ").strip()
+    
+    counter = HandCrossingCounter(username)
     counter.run()
 
 
