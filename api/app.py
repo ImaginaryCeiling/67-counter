@@ -258,6 +258,6 @@ def submit_session():
 if __name__ == '__main__':
     init_database()
     print("🚀 Starting 67 Counter API...")
-    print("📊 API will be available at http://localhost:5002")
+    print("📊 API will be available at https://67-counter-api.vercel.app")
     print("🔄 Database will sync from crossing_results.json on each request")
     app.run(debug=True, host='0.0.0.0', port=5002)

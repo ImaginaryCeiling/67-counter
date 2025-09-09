@@ -232,7 +232,7 @@ class HandCrossingCounter:
             
             # Try to submit to API
             try:
-                api_url = os.getenv('API_URL', 'http://localhost:5002')
+                api_url = os.getenv('API_URL', 'https://67-counter-api.vercel.app')
                 response = requests.post(
                     f'{api_url}/api/submit',
                     json=result_entry,

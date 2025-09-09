@@ -31,7 +31,7 @@ export default function Home() {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5002'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://67-counter-api.vercel.app'
       const [rankingsRes, statsRes] = await Promise.all([
         fetch(`${apiUrl}/api/rankings`),
         fetch(`${apiUrl}/api/stats`)

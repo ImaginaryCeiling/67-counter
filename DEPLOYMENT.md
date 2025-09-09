@@ -94,7 +94,7 @@ You can also deploy both from a single repository:
 
 **Local Development (.env.local):**
 ```bash
-NEXT_PUBLIC_API_URL=http://localhost:5002
+NEXT_PUBLIC_API_URL=https://67-counter-api.vercel.app
 ```
 
 ### API (no env vars needed)
@@ -108,7 +108,7 @@ export API_URL=https://your-api.vercel.app
 
 **Local Development:**
 ```bash
-export API_URL=http://localhost:5002
+export API_URL=https://67-counter-api.vercel.app
 # or just omit - defaults to localhost:5002
 ```
 
