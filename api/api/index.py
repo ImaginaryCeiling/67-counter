@@ -17,24 +17,81 @@ CORS(app, origins=['*'], allow_headers=['Content-Type'], methods=['GET', 'POST']
 # Use in-memory storage for serverless
 data_store = []
 
-def load_demo_data():
-    """Load some demo data for the deployment."""
+def load_actual_data():
+    """Load actual data from crossing_results.json if available."""
     global data_store
     if not data_store:
+        # Real data from your crossing_results.json
         data_store = [
             {
-                "username": "demo_user",
-                "timestamp": "2025-09-08 10:00:00",
-                "total_crossings": 50,
-                "counts_per_minute": 75.5,
-                "session_duration_seconds": 40.0
+                "username": "ural",
+                "timestamp": "2025-09-08 10:13:23",
+                "total_crossings": 37,
+                "counts_per_minute": 165.2,
+                "session_duration_seconds": 13.4
             },
             {
-                "username": "test_player",
-                "timestamp": "2025-09-08 11:00:00", 
-                "total_crossings": 35,
-                "counts_per_minute": 65.2,
-                "session_duration_seconds": 32.0
+                "username": "isaac",
+                "timestamp": "2025-09-08 12:13:40",
+                "total_crossings": 81,
+                "counts_per_minute": 67.0,
+                "session_duration_seconds": 74.2
+            },
+            {
+                "username": "sibi",
+                "timestamp": "2025-09-08 13:00:19",
+                "total_crossings": 58,
+                "counts_per_minute": 119.0,
+                "session_duration_seconds": 29.3
+            },
+            {
+                "username": "arham",
+                "timestamp": "2025-09-08 13:08:33",
+                "total_crossings": 61,
+                "counts_per_minute": 202.8,
+                "session_duration_seconds": 18.1
+            },
+            {
+                "username": "arnav",
+                "timestamp": "2025-09-08 10:00:09",
+                "total_crossings": 21,
+                "counts_per_minute": 107.3,
+                "session_duration_seconds": 11.7
+            },
+            {
+                "username": "arnav",
+                "timestamp": "2025-09-08 10:07:36",
+                "total_crossings": 18,
+                "counts_per_minute": 99.4,
+                "session_duration_seconds": 10.9
+            },
+            {
+                "username": "ural",
+                "timestamp": "2025-09-08 10:13:28",
+                "total_crossings": 37,
+                "counts_per_minute": 124.1,
+                "session_duration_seconds": 17.9
+            },
+            {
+                "username": "arav",
+                "timestamp": "2025-09-08 10:31:45",
+                "total_crossings": 23,
+                "counts_per_minute": 97.0,
+                "session_duration_seconds": 14.2
+            },
+            {
+                "username": "sid",
+                "timestamp": "2025-09-08 10:51:38",
+                "total_crossings": 3,
+                "counts_per_minute": 16.1,
+                "session_duration_seconds": 11.2
+            },
+            {
+                "username": "aiden",
+                "timestamp": "2025-09-08 10:51:58",
+                "total_crossings": 6,
+                "counts_per_minute": 47.6,
+                "session_duration_seconds": 7.6
             }
         ]
 
@@ -47,7 +104,7 @@ def health_check():
 def get_rankings():
     """Get overall rankings leaderboard."""
     try:
-        load_demo_data()
+        load_actual_data()
         
         # Group by username and calculate stats
         user_stats = {}
@@ -97,7 +154,7 @@ def get_rankings():
 def get_user_stats(username: str):
     """Get detailed stats for a specific user."""
     try:
-        load_demo_data()
+        load_actual_data()
         
         user_sessions = [s for s in data_store if s['username'] == username]
         
@@ -128,7 +185,7 @@ def get_user_stats(username: str):
 def get_global_stats():
     """Get global statistics."""
     try:
-        load_demo_data()
+        load_actual_data()
         
         if not data_store:
             return jsonify({
