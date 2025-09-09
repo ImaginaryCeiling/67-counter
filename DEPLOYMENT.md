@@ -88,13 +88,29 @@ You can also deploy both from a single repository:
 
 ## Environment Variables
 
-### Frontend (.env.local)
-```
-NEXT_PUBLIC_API_URL=https://your-api.vercel.app
+### Frontend
+**Vercel Environment Variable:**
+- `NEXT_PUBLIC_API_URL` = `https://your-api.vercel.app`
+
+**Local Development (.env.local):**
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:5002
 ```
 
 ### API (no env vars needed)
 The API uses in-memory storage and includes demo data.
+
+### Python Script (Optional)
+**For production API:**
+```bash
+export API_URL=https://your-api.vercel.app
+```
+
+**Local Development:**
+```bash
+export API_URL=http://localhost:5002
+# or just omit - defaults to localhost:5002
+```
 
 ## Testing Deployment
 

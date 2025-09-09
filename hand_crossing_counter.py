@@ -10,6 +10,7 @@ import numpy as np
 import time
 import json
 import requests
+import os
 from datetime import datetime
 
 
@@ -231,8 +232,9 @@ class HandCrossingCounter:
             
             # Try to submit to API
             try:
+                api_url = os.getenv('API_URL', 'http://localhost:5002')
                 response = requests.post(
-                    'http://localhost:5002/api/submit',
+                    f'{api_url}/api/submit',
                     json=result_entry,
                     timeout=5
                 )
