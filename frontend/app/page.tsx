@@ -229,7 +229,7 @@ export default function Home() {
             <li>Run the hand crossing counter Python script</li>
             <li>Enter your username when prompted</li>
             <li>Perform hand crossings in front of your camera</li>
-            <li>Press 's' to save your session results</li>
+            <li>Press &apos;s&apos; to save your session results</li>
             <li>Check back here to see your rankings!</li>
           </ol>
         </div>
