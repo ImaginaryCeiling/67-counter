@@ -14,24 +14,94 @@
     "session_duration_seconds": 10.9
   },
   {
-    "username": "skibidi rizzler gob",
+    "username": "ural",
     "timestamp": "2025-09-08 10:13:23",
     "total_crossings": 37,
     "counts_per_minute": 165.2,
     "session_duration_seconds": 13.4
   },
   {
-    "username": "skibidi rizzler gob",
+    "username": "ural",
     "timestamp": "2025-09-08 10:13:28",
     "total_crossings": 37,
     "counts_per_minute": 124.1,
     "session_duration_seconds": 17.9
   },
   {
-    "username": "skibidi rizzler gob",
+    "username": "ural",
     "timestamp": "2025-09-08 10:13:28",
     "total_crossings": 37,
     "counts_per_minute": 122.5,
     "session_duration_seconds": 18.1
+  },
+  {
+    "username": "arnav",
+    "timestamp": "2025-09-08 10:30:53",
+    "total_crossings": 11,
+    "counts_per_minute": 89.3,
+    "session_duration_seconds": 7.4
+  },
+  {
+    "username": "arav",
+    "timestamp": "2025-09-08 10:31:45",
+    "total_crossings": 23,
+    "counts_per_minute": 97.0,
+    "session_duration_seconds": 14.2
+  },
+  {
+    "username": "sid",
+    "timestamp": "2025-09-08 10:51:38",
+    "total_crossings": 3,
+    "counts_per_minute": 16.1,
+    "session_duration_seconds": 11.2
+  },
+  {
+    "username": "aiden",
+    "timestamp": "2025-09-08 10:51:58",
+    "total_crossings": 6,
+    "counts_per_minute": 47.6,
+    "session_duration_seconds": 7.6
+  },
+  {
+    "username": "isaac",
+    "timestamp": "2025-09-08 12:13:40",
+    "total_crossings": 81,
+    "counts_per_minute": 67,
+    "session_duration_seconds": 74.2
+  },
+  {
+    "username": "sibi",
+    "timestamp": "2025-09-08 13:00:19",
+    "total_crossings": 58,
+    "counts_per_minute": 119.0,
+    "session_duration_seconds": 29.3
+  },
+  {
+    "username": "arham",
+    "timestamp": "2025-09-08 13:08:33",
+    "total_crossings": 61,
+    "counts_per_minute": 202.8,
+    "session_duration_seconds": 18.1
+  },
+  {
+    "username": "arham",
+    "timestamp": "2025-09-08 13:09:41",
+    "total_crossings": 55,
+    "counts_per_minute": 162.5,
+    "session_duration_seconds": 20.3
+  },
+  {
+    "username": "kayhirani",
+    "timestamp": "2025-09-08 14:32:32",
+    "total_crossings": 5,
+    "counts_per_minute": 31.1,
+    "session_duration_seconds": 9.6
+  },
+  {
+    "username": "kayhirani",
+    "timestamp": "2025-09-08 14:36:18",
+    "total_crossings": 172,
+    "counts_per_minute": 204.7,
+    "session_duration_seconds": 50.4
   }
 ]
