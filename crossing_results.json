@@ -103,5 +103,47 @@
     "total_crossings": 172,
     "counts_per_minute": 204.7,
     "session_duration_seconds": 50.4
+  },
+  {
+    "username": "arnav",
+    "timestamp": "2025-09-08 23:01:59",
+    "total_crossings": 69,
+    "counts_per_minute": 244.9,
+    "session_duration_seconds": 16.9
+  },
+  {
+    "username": "tejuice",
+    "timestamp": "2025-09-09 10:41:59",
+    "total_crossings": 92,
+    "counts_per_minute": 115.8,
+    "session_duration_seconds": 47.7
+  },
+  {
+    "username": "arav",
+    "timestamp": "2025-09-09 10:42:52",
+    "total_crossings": 82,
+    "counts_per_minute": 128.0,
+    "session_duration_seconds": 38.4
+  },
+  {
+    "username": "nawal",
+    "timestamp": "2025-09-09 10:44:50",
+    "total_crossings": 18,
+    "counts_per_minute": 185.5,
+    "session_duration_seconds": 5.8
+  },
+  {
+    "username": "isaac",
+    "timestamp": "2025-09-09 12:14:52",
+    "total_crossings": 53,
+    "counts_per_minute": 174.7,
+    "session_duration_seconds": 18.2
+  },
+  {
+    "username": "isaac",
+    "timestamp": "2025-09-09 12:16:51",
+    "total_crossings": 397,
+    "counts_per_minute": 261,
+    "session_duration_seconds": 98.3
   }
 ]
