@@ -145,5 +145,12 @@
     "total_crossings": 397,
     "counts_per_minute": 261,
     "session_duration_seconds": 98.3
+  },
+  {
+    "username": "Femi",
+    "timestamp": "2025-09-10 10:50:44",
+    "total_crossings": 8,
+    "counts_per_minute": 58.5,
+    "session_duration_seconds": 8.2
   }
 ]
